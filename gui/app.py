@@ -16,23 +16,15 @@ from utils.version import print_version_info, print_citation_info
 class ComtailsGUI:
     """Окно управления запуском моделирования COMTAILS."""
 
-    def __init__(
-        self,
-        root: tk.Tk,
-        input_dir: str = "input",
-        output_dir: str = "output",
-        config_file: str = "TAIL_INPUTS.dat",
-        dust_profile: str = "dmdt_vel_power_rmin_rmax.dat",
-        auto_run: bool = False
-    ):
+    def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("COMTAILS — русскоязычный интерфейс")
         self.root.geometry("1080x760")
 
-        self.input_dir = tk.StringVar(value=input_dir)
-        self.output_dir = tk.StringVar(value=output_dir)
-        self.config_file = tk.StringVar(value=config_file)
-        self.dust_profile = tk.StringVar(value=dust_profile)
+        self.input_dir = tk.StringVar(value="input")
+        self.output_dir = tk.StringVar(value="output")
+        self.config_file = tk.StringVar(value="TAIL_INPUTS.dat")
+        self.dust_profile = tk.StringVar(value="dmdt_vel_power_rmin_rmax.dat")
 
         self.run_button = None
         self.log_text = None
@@ -41,8 +33,6 @@ class ComtailsGUI:
         self.preview_image = None
 
         self._build_layout()
-        if auto_run:
-            self.root.after(150, self._run_async)
 
     def _build_layout(self):
         top = ttk.Frame(self.root, padding=8)
@@ -175,24 +165,11 @@ class ComtailsGUI:
             self.preview_image = None
 
 
-def run_gui(
-    input_dir: str = "input",
-    output_dir: str = "output",
-    config_file: str = "TAIL_INPUTS.dat",
-    dust_profile: str = "dmdt_vel_power_rmin_rmax.dat",
-    auto_run: bool = False
-):
+def run_gui():
     root = tk.Tk()
     style = ttk.Style(root)
     if "clam" in style.theme_names():
         style.theme_use("clam")
-    app = ComtailsGUI(
-        root,
-        input_dir=input_dir,
-        output_dir=output_dir,
-        config_file=config_file,
-        dust_profile=dust_profile,
-        auto_run=auto_run
-    )
+    app = ComtailsGUI(root)
     root.mainloop()
     return app

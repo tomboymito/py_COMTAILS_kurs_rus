@@ -14,6 +14,7 @@ from utils.io_utils import reset_directory
 
 def parse_arguments():
     """Разобрать аргументы командной строки."""
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='COMTAILS: симулятор пылевого хвоста кометы')
 
     parser.add_argument('--input-dir', type=str, default='input',
@@ -63,6 +64,7 @@ def main():
             dust_profile=args.dust_profile,
             auto_run=args.gui_autorun
         )
+        run_gui()
         return
 
     # Check for required input files

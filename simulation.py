@@ -259,6 +259,14 @@ class SimulationController:
             png_preview = save_flux_png(self.config.flux, "output/tail_preview.png")
             if png_preview:
                 print(f"Сформировано резервное превью: {png_preview}")
+        # Fallback preview: dust_particles.png -> tail_preview.ppm -> tail_preview.png
+        final_image = "output/dust_particles.png"
+        if not os.path.exists(final_image):
+            ppm_preview = save_flux_ppm(self.config.flux, "output/tail_preview.ppm")
+            print(f"Сформирован fallback preview: {ppm_preview}")
+            png_preview = save_flux_png(self.config.flux, "output/tail_preview.png")
+            if png_preview:
+                print(f"Сформирован fallback preview: {png_preview}")
 
         # Write Afrho to file
         with open("output/afrho.dat", "a") as f:
@@ -335,6 +343,10 @@ class SimulationController:
                 return False
             else:
                 print(f"Проверка пройдена: Afrho={afrho}, звёздная величина={mag}")
+                      f"Mag={mag} (ожидалось {expected_mag})")
+                return False
+            else:
+                print(f"Проверка пройдена: Afrho={afrho}, Mag={mag}")
                 return True
         except Exception as e:
             print(f"Ошибка проверки: {e}")

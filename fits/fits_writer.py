@@ -1,40 +1,29 @@
-"""
-FITS file writing module for COMTAILS simulation.
-
-This module provides utilities for writing FITS images from simulation results.
-"""
+"""Модуль записи FITS-файлов для COMTAILS."""
 import os
 import numpy as np
 import astropy.io.fits as fits
 
 class FitsWriter:
-    """
-    Class for writing FITS files from simulation data.
-
-    This class provides methods to write simulation results to FITS files
-    with appropriate header information.
-    """
+    """Класс записи результатов моделирования в FITS с нужными заголовками."""
 
     def __init__(self):
-        """Initialize the FITS writer."""
+        """Инициализировать модуль записи FITS."""
         # Ensure output directory exists
         os.makedirs('output', exist_ok=True)
 
     def write_fits_image(self, outimage, imagefit, object_name, start_jd, end_jd,
                          grdsiz, ntotmc, swap_axis_and_subtract_1_1=True):
-        """
-        Write a FITS image to disk.
+        """Записать изображение в FITS.
 
-        Args:
-            outimage: Path to output FITS file
-            imagefit: Image array to write
-            object_name: Name of the object (comet)
-            start_jd: Start Julian date
-            end_jd: End Julian date (observation)
-            grdsiz: Grid size in km/pixel
-            ntotmc: Total number of Monte Carlo events
-            swap_axis_and_subtract_1_1: Whether to swap x and y axes and shift entire matrix by (-1,-1)
-                                      (default: True to match FORTRAN results)
+        Параметры:
+            outimage: путь к выходному FITS-файлу
+            imagefit: двумерный массив изображения
+            object_name: имя объекта (кометы)
+            start_jd: начальная юлианская дата
+            end_jd: дата наблюдения (юлианская)
+            grdsiz: размер пикселя сетки, км/пикс
+            ntotmc: общее число Монте-Карло событий
+            swap_axis_and_subtract_1_1: поменять оси местами и сдвинуть матрицу на (-1, -1)
         """
         # Make a copy to avoid modifying the original data
         data_to_write = imagefit.copy()
@@ -61,4 +50,4 @@ class FitsWriter:
 
         # Write to disk
         hdu.writeto(outimage, overwrite=True)
-        print(f"Wrote FITS file: {outimage}")
+        print(f"Записан FITS-файл: {outimage}")

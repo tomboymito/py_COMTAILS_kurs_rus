@@ -444,11 +444,11 @@ class SimulationConfig:
             )
             # Calculate how many particles we expect to plot
             expected_count = int(self.ntotmc * (1.0 - self.pcp))
-            print(f"Will plot approximately {expected_count} particles ({(1.0 - self.pcp) * 100:.1f}% of total)")
+            print(f"Будет отображено примерно {expected_count} частиц ({(1.0 - self.pcp) * 100:.1f}% от общего числа)")
 
         # Print grid information
-        print(f" Image scale={self.grdsiz:10.3f} km/px <==> {self.scale:8.3f} arcsec/px " +
-              f"Field of view= {self.nx*self.scale/60.0:8.3f} x{self.ny*self.scale/60.0:8.3f} arcmin")
+        print(f" Масштаб изображения={self.grdsiz:10.3f} км/пикс <==> {self.scale:8.3f} угл.сек/пикс " +
+              f"Поле зрения= {self.nx*self.scale/60.0:8.3f} x{self.ny*self.scale/60.0:8.3f} угл.мин")
 
         return plot_handler
 
@@ -561,11 +561,11 @@ class SimulationConfig:
         self.steprlog = FLOAT_TYPE((self.r2log - self.r1log) / float(self.nsizes))
 
         # Add missing output information
-        print(f"  Helioc. coor. of the Earth at obs. date:   {self.xe:8.7f}  {self.ye:8.7f}  {self.ze:8.7f}")
-        print(f"  TARGET RA (h,m,s):    {self.rah:2d} {int(self.ram):2d} {self.ras:5.2f}")
-        print(f"  TARGET DEC(d,m,s):   {self.ded:2d} {int(self.dem):2d} {self.des:5.2f}")
+        print(f"  Гелиоцентрические координаты Земли на дату наблюдения:   {self.xe:8.7f}  {self.ye:8.7f}  {self.ze:8.7f}")
+        print(f"  Прямое восхождение цели (ч,м,с):    {self.rah:2d} {int(self.ram):2d} {self.ras:5.2f}")
+        print(f"  Склонение цели (г,м,с):            {self.ded:2d} {int(self.dem):2d} {self.des:5.2f}")
         print(
-            f"  Phase angle = {self.phas_ang:7.3f} Pos. angle = {self.psang:7.3f} Plane angle= {self.plang:7.3f} (deg)")
-        print(f"  Comet elements: EC= {comet.ec:9.6f} QR= {comet.qr:9.6f} au    TP= {comet.per_jd:12.5f}")
-        print(f"  Comet elements: NODE= {comet.om:7.3f} W= {comet.wper:7.3f} INC= {comet.inc:7.3f} (deg)")
-        print(f"  Target heliocentric distance= {self.rcobs:10.3f} au  Distance to observer= {self.delta:10.3f} au")
+            f"  Фазовый угол = {self.phas_ang:7.3f} Позиционный угол = {self.psang:7.3f} Угол плоскости орбиты= {self.plang:7.3f} (град)")
+        print(f"  Орбитальные элементы кометы: e= {comet.ec:9.6f} q= {comet.qr:9.6f} а.е.    Tпер= {comet.per_jd:12.5f}")
+        print(f"  Орбитальные элементы кометы: Ω= {comet.om:7.3f} ω= {comet.wper:7.3f} i= {comet.inc:7.3f} (град)")
+        print(f"  Гелиоцентрическое расстояние кометы= {self.rcobs:10.3f} а.е.  Расстояние до наблюдателя= {self.delta:10.3f} а.е.")

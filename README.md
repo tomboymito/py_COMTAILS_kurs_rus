@@ -1,127 +1,116 @@
-# COMTAILS - COMetary dust TAIL Simulator
+# COMTAILS — симулятор пылевого хвоста кометы
 
-COMTAILS is a comprehensive Python implementation of a comet dust tail simulation program. It improves upon the original FORTRAN 77 code developed by Fernando Moreno (IAA-CSIC) with a cleaner object-oriented design, enhanced numerical stability, and improved visualization capabilities. The porting of the FORTRAN serial version to this parallel Python version was performed by Rafael Morales and Nicolás Robles (IAA-CSIC).
-The original reposoritory with FORTRAN versions is: https://github.com/FernandoMorenoDanvila/COMTAILS/tree/FORTRAN_SERIAL (FORTRAN serial)  and https://github.com/FernandoMorenoDanvila/COMTAILS/tree/FORTRAN_PARALLEL (FORTRAN MPI parallel version).
+COMTAILS — Python-реализация модели формирования пылевого хвоста кометы. Проект основан на оригинальном FORTRAN-коде Fernando Moreno (IAA-CSIC) и адаптирован в объектно-ориентированной архитектуре с сохранением научной логики расчёта.
 
-## Description
+## Возможности
 
-COMTAILS generates realistic simulations of comet dust tails by modeling the dynamics of dust particles under the influence of solar radiation pressure and solar gravity. It produces high-quality images that can be compared with actual observations of comets.
+- Монте-Карло моделирование динамики пылевых частиц.
+- Расчёт орбиты с использованием решения уравнения Кеплера.
+- Эфемериды через JPL Horizons.
+- Подмешивание звёздного поля (Gaia EDR3).
+- Научные выходы в FITS (`tail_sdu.fits`, `tail_mag.fits`, `OPT_DEPTH.fits`).
+- Расчёт фотометрических параметров `Afrho` и интегральной звёздной величины.
+- Визуализация распределения частиц и fallback preview изображения.
+- Два режима запуска: CLI и GUI.
 
-### Key Features
+## Установка
 
-- Monte Carlo simulation of dust particle dynamics 
-- High-precision orbital calculations using Kepler's equation solvers
-- Support for different ejection models (isotropic, sunward, active areas)
-- Integration with JPL Horizons for accurate ephemerides
-- Star field overlay from Gaia EDR3
-- FITS image output for scientific analysis
-- Particle visualization with pygame
-- Multiprocessing support for improved performance
-- Calculation of Afrho and magnitude parameters
+### Зависимости
 
-## Installation
+- Python 3.8+
+- `numpy`
+- `astropy`
+- `pygame`
+- `requests`
 
-### Prerequisites
+Установка:
 
-- Python 3.8 or later
-- NumPy
-- AstroPy
-- PyGame (for visualization)
-- Requests (for JPL Horizons API access)
+```bash
+pip install numpy astropy pygame requests
+```
 
-### Installation Steps
+## Запуск
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/username/comtails.git
-   cd comtails
-   ```
-
-2. Install dependencies:
-   ```bash
-   pip install numpy astropy pygame requests
-   ```
-
-## Usage
-
-### Basic Usage
-
-Run a simulation with default parameters:
+### 1) CLI-режим (по умолчанию)
 
 ```bash
 python main.py
 ```
 
-### Custom Configuration
-
-Specify custom configuration files:
+С пользовательскими путями:
 
 ```bash
-python main.py --input-dir custom_inputs --config my_config.dat --dust-profile my_profile.dat
+python main.py --input-dir input --output-dir output --config TAIL_INPUTS.dat --dust-profile dmdt_vel_power_rmin_rmax.dat
 ```
 
-### Configuration Files
+### 2) GUI-режим
 
-COMTAILS requires two main configuration files:
+```bash
+python main.py --gui
+```
 
-1. **Main configuration file** (default: `TAIL_INPUTS.dat`):
-   - Contains comet parameters, observation setup, and simulation controls
-   - Specifies date range, image grid size, and dust physical properties
+GUI + автоматический запуск расчёта сразу после открытия окна:
 
-2. **Dust loss rate profile** (default: `dmdt_vel_power_rmin_rmax.dat`):
-   - Defines dust production rates, velocity factors, size distribution power-law indices, and particle size ranges vs. time
+```bash
+python main.py --gui --gui-autorun
+```
 
-## Output Files
+В GUI доступны:
 
-The simulation produces the following output files in the `output` directory:
+- **Журнал вычислений** (пошаговый лог расчёта);
+- **Итоговый блок результата** (`Afrho`, звёздная величина, масса пыли, путь к изображению);
+- **Показ итогового изображения**.
 
-- `tail_sdu.fits`: Dust tail brightness image (solar disk intensity units)
-- `tail_mag.fits`: Dust tail brightness image (mag/arcsec²)
-- `OPT_DEPTH.fits`: Optical depth map
-- `afrho.dat`: Afrho parameter vs. time
-- `dust_particles.png`: Visualization of particle positions (if enabled)
-- `dustlossrate.dat`: Dust loss rate vs. time
-- Additional files based on configuration settings
+## Логика итогового изображения и fallback
 
-## Code Structure
+После расчёта программа ищет итоговое изображение в следующем порядке:
 
-- `main.py`: Entry point for running the simulation
-- `simulation.py`: Main simulation controller
-- `config.py`: Configuration management
-- `constants.py`: Physical and mathematical constants
-- `comet.py`: Comet model and orbital properties
-- `dust_tail.py`: Dust tail simulation with Monte Carlo methods
-- `heliorbit.py`: Heliocentric orbit calculations
-- `orbit_solver.py`: Kepler's equation solvers
-- `star_field.py`: Star field generation
-- `plot_handler.py`: Visualization utilities
-- `horizons_client.py`: JPL Horizons API client
-- `fits_writer.py`: FITS image output
+1. `output/dust_particles.png`
+2. `output/tail_preview.ppm`
+3. `output/tail_preview.png`
 
-## License
+Если `dust_particles.png` не создан, формируется fallback-превью из расчётного потока яркости:
 
-See the LICENSE file for details (MIT license).
+- обязательно `tail_preview.ppm`;
+- дополнительно `tail_preview.png` (если доступно сохранение PNG через `pygame`).
 
-## Citation
+## Выходные файлы
 
-If you use this code in your research, please write in  your paper that:
+В каталоге `output` создаются:
 
-``The model results are based on a python implementation, performed by Rafael Morales and Nicolás Robles  of the Instituto de Astrofísica de Andalucía, from the original FORTRAN serial code written by Fernando Moreno (Moreno, 2025)``
+- `tail_sdu.fits` — карта яркости пылевого хвоста (в единицах солнечного диска);
+- `tail_mag.fits` — карта яркости в `mag/arcsec²`;
+- `OPT_DEPTH.fits` — карта оптической толщины;
+- `afrho.dat` — эволюция параметров `Afrho`;
+- `dustlossrate.dat` — темп потери пыли;
+- `dust_particles.png` — визуализация частиц (если включён графический вывод);
+- `tail_preview.ppm`, `tail_preview.png` — fallback-превью, если основное PNG отсутствует.
 
-and include in your reference list:
+## Структура проекта
 
-``Moreno, F. (2025). COMetary dust TAIL Simulator (COMTAILS): A computer code to generate comet dust tail brightness images
-Astronomy and Astrophysics, Volume:695(2025), Article:A263.``
+- `main.py` — точка входа, поддержка CLI и `--gui`;
+- `gui/app.py` — простой русскоязычный графический интерфейс;
+- `simulation.py` — основной контроллер моделирования;
+- `config.py` — чтение и хранение параметров;
+- `models/` — физические модели кометы и пыли;
+- `visualization/plot_handler.py` — графика частиц и подписи на русском;
+- `visualization/preview_utils.py` — генерация fallback preview.
 
+## Научная терминология
 
-## Acknowledgments
+В пользовательской части используются астрофизически корректные термины:
 
-If you use this code in your research, please write in the acknowledgements of your papert:
+- **Прямое восхождение (ПВ, RA)**;
+- **Склонение (DEC)**;
+- **перигелий / время до перигелия**;
+- **оптическая толщина**, **звёздная величина**, **пылепроизводительность**.
 
-``The model results are based on a python implementation, performed by Rafael Morales and Nicolás Robles of
-the Instituto de Astrofísica de Andalucía, from the original FORTRAN serial code written by Fernando Moreno (Moreno, 2025)``
+## Лицензия
 
-and give also acknowledgements to:
+MIT, подробности см. в `LICENSE`.
 
-- NASA/JPL-Caltech for the Horizons ephemeris system
-- ESA/Gaia for the star catalog data
+## Цитирование
+
+Если вы используете COMTAILS в научной работе, укажите происхождение модели и публикацию:
+
+- Moreno, F. (2025). *COMetary dust TAIL Simulator (COMTAILS): A computer code to generate comet dust tail brightness images*. Astronomy and Astrophysics, 695, A263.

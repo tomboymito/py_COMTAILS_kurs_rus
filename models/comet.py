@@ -1,8 +1,4 @@
-"""
-Comet model for COMTAILS simulation.
-
-This module provides a class for representing a comet and its orbital properties.
-"""
+"""Модель кометы для расчётов COMTAILS."""
 import numpy as np
 from constants import FLOAT_TYPE, TORAD, TWOPI, MU
 from utils.date_time import caldate
@@ -10,12 +6,7 @@ from orbital.orbit_solver import elements_to_xv
 
 
 class Comet:
-    """
-    Class representing a comet and its orbital properties.
-
-    This class stores the comet's physical parameters, orbital elements,
-    and state vectors over time.
-    """
+    """Класс, описывающий комету, её орбиту и состояние во времени."""
 
     def __init__(self, config):
         """
@@ -150,22 +141,15 @@ class Comet:
             self.vzarr[i] = FLOAT_TYPE(vz)
 
     def print_orbit_info(self, start_jd, end_jd, per_jd):
-        """
-        Print orbit information.
-
-        Args:
-            start_jd: Start Julian date
-            end_jd: End Julian date
-            per_jd: Perihelion Julian date
-        """
+        """Вывести основные сведения об орбите и эпохах наблюдения."""
         start_dd, start_mm, start_yy = caldate(start_jd)
         obs_dd, obs_mm, obs_yy = caldate(end_jd)
 
-        print(f" Start activity date (Day,Month,Year): {start_dd:7.3f} {int(start_mm):2d} {int(start_yy):5d}")
-        print(f"  Observing date      (Day,Month,Year): {obs_dd:7.3f} {int(obs_mm):2d} {int(obs_yy):5d}")
+        print(f" Дата начала активности (день, месяц, год): {start_dd:7.3f} {int(start_mm):2d} {int(start_yy):5d}")
+        print(f" Дата наблюдения       (день, месяц, год): {obs_dd:7.3f} {int(obs_mm):2d} {int(obs_yy):5d}")
 
-        print(f" JD at activation: {start_jd:14.5f}  ,i.e., {start_jd - per_jd:10.2f} days to perihelion")
-        print(f" JD at observation: {end_jd:14.5f}  ,i.e., {end_jd - per_jd:10.2f} days to perihelion")
+        print(f" JD начала активности: {start_jd:14.5f}  , т.е. {start_jd - per_jd:10.2f} суток до перигелия")
+        print(f" JD наблюдения:       {end_jd:14.5f}  , т.е. {end_jd - per_jd:10.2f} суток до перигелия")
 
         if self.ec < 1.0:
-            print(f" Orbital period: {self.orb_per / 365.25:10.3f} years")
+            print(f" Орбитальный период: {self.orb_per / 365.25:10.3f} лет")

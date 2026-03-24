@@ -5,6 +5,7 @@ This module provides the core simulation controller that orchestrates the
 comet dust tail simulation. It improves upon the original COMTAILS.for Fortran 77 code
 by Fernando Moreno IAA-CSIC by implementing a cleaner object-oriented design.
 """
+import os
 import time
 import numpy as np
 
@@ -14,6 +15,7 @@ from horizons.horizons_client import HorizonsClient
 from models.comet import Comet
 from models.dust_tail import DustTail
 from visualization.star_field import StarField
+from visualization.preview_utils import save_flux_ppm, save_flux_png
 from utils.coordinate_transforms import TransformationFactory
 from constants import FLOAT_TYPE
 
@@ -72,7 +74,7 @@ class SimulationController:
         # End CPU timer
         self.end_time = time.time()
         elapsed_minutes = (self.end_time - self.start_time) / 60.0
-        print(f" Elapsed CPU time: {elapsed_minutes:12.5f} minutes")
+        print(f" Затраченное CPU-время: {elapsed_minutes:12.5f} минут")
 
         return results
 
@@ -103,7 +105,7 @@ class SimulationController:
 
     def _fetch_comet_coordinates(self):
         """Fetch comet coordinates and orbital elements from JPL Horizons."""
-        print("Downloading ephemeris from JPL-Horizons...")
+        print("Загрузка эфемерид из JPL-Horizons...")
 
         # Get Earth position
         earth_data = self.horizons_client.get_earth_position(self.config.end_jd)
@@ -161,7 +163,7 @@ class SimulationController:
     def _build_dust_tail(self):
         """Build the dust tail through Monte Carlo simulation."""
         # Fixed formatting to match expected output
-        print("Building up dust tail ...")
+        print("Построение пылевого хвоста ...")
         self.dust_tail.build(
             self.comet,
             self.config,
@@ -169,7 +171,7 @@ class SimulationController:
         )
 
         # Add the missing output line for total dust mass
-        print(f"  Total dust mass ejected= {self.dust_tail.total_mass:.3E} kg")
+        print(f"  Полная выброшенная масса пыли = {self.dust_tail.total_mass:.3E} кг")
 
     def _finalize_image(self):
         """Finalize the dust tail image and apply effects."""
@@ -189,8 +191,8 @@ class SimulationController:
         # Add star field to total flux
         star_flux_sum = np.sum(self.config.flux_star)
         print(
-            f"Star field contains {np.count_nonzero(self.config.flux_star)} non-zero pixels, max flux: {np.max(self.config.flux_star)}")
-        print(f"Adding total star flux: {star_flux_sum}")
+            f"Звёздное поле: {np.count_nonzero(self.config.flux_star)} ненулевых пикселей, максимум потока: {np.max(self.config.flux_star)}")
+        print(f"Добавление суммарного звёздного потока: {star_flux_sum}")
         self.config.flux += self.config.flux_star
 
         # Apply convolution if requested
@@ -214,7 +216,7 @@ class SimulationController:
         )
 
         # Fixed formatting to match expected output
-        print(f"  Aperture(km)= {self.config.rho_ap:10.2f} Afrho(m)= {afrho:8.3f} Mag= {mag:8.3f}")
+        print(f"  Апертура (км)= {self.config.rho_ap:10.2f} Afrho (м)= {afrho:8.3f} Звёздная величина= {mag:8.3f}")
 
         # Write output files
         self.fits_writer.write_fits_image(
@@ -254,7 +256,16 @@ class SimulationController:
         if self.config.igrapho == 1 and self.plot_handler and self.plot_handler.available:
             self.plot_handler.save_image()
             self.plot_handler.close()
-            print("Particle plot generated successfully")
+            print("График частиц успешно сформирован")
+
+        # Fallback preview: dust_particles.png -> tail_preview.ppm -> tail_preview.png
+        final_image = "output/dust_particles.png"
+        if not os.path.exists(final_image):
+            ppm_preview = save_flux_ppm(self.config.flux, "output/tail_preview.ppm")
+            print(f"Сформирован fallback preview: {ppm_preview}")
+            png_preview = save_flux_png(self.config.flux, "output/tail_preview.png")
+            if png_preview:
+                print(f"Сформирован fallback preview: {png_preview}")
 
         # Write Afrho to file
         with open("output/afrho.dat", "a") as f:
@@ -266,8 +277,22 @@ class SimulationController:
             "afrho": afrho,
             "afrho_0": afrho_0,
             "mag": mag,
-            "total_dust_mass": self.dust_tail.total_mass
+            "total_dust_mass": self.dust_tail.total_mass,
+            "image_path": self._get_best_preview_path()
         }
+
+    @staticmethod
+    def _get_best_preview_path():
+        """Вернуть путь к наилучшему доступному итоговому изображению."""
+        candidates = [
+            "output/dust_particles.png",
+            "output/tail_preview.ppm",
+            "output/tail_preview.png",
+        ]
+        for path in candidates:
+            if os.path.exists(path):
+                return path
+        return None
 
     def _calculate_magnitude_image(self):
         """Calculate image in mag/arcsec^2 units."""
@@ -312,12 +337,12 @@ class SimulationController:
             mag_diff = abs(mag - expected_mag) / expected_mag
 
             if afrho_diff > tolerance or mag_diff > tolerance:
-                print(f"Validation failed: Afrho={afrho} (expected {expected_afrho}), "
-                      f"Mag={mag} (expected {expected_mag})")
+                print(f"Проверка не пройдена: Afrho={afrho} (ожидалось {expected_afrho}), "
+                      f"Mag={mag} (ожидалось {expected_mag})")
                 return False
             else:
-                print(f"Validation passed: Afrho={afrho}, Mag={mag}")
+                print(f"Проверка пройдена: Afrho={afrho}, Mag={mag}")
                 return True
         except Exception as e:
-            print(f"Validation error: {e}")
+            print(f"Ошибка проверки: {e}")
             return False

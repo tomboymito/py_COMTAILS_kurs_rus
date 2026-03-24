@@ -78,10 +78,10 @@ class PlotHandler:
             # Set available flag
             self.available = True
 
-            print(f"Plot handler initialized with dimensions: {self.width}x{self.height}")
+            print(f"Модуль графики инициализирован: {self.width}x{self.height}")
 
         except Exception as e:
-            print(f"Error initializing PlotHandler: {e}")
+            print(f"Ошибка инициализации PlotHandler: {e}")
             self.available = False
 
     def draw_axes(self):
@@ -149,12 +149,12 @@ class PlotHandler:
                         (self.width - self.margin, y_pos), 1)
 
         # X-axis label
-        x_label = self.label_font.render("Projected distance on RA axis [km]", True, self.text_color)
+        x_label = self.label_font.render("Проекция расстояния по оси ПВ [км]", True, self.text_color)
         self.screen.blit(x_label, (self.width//2 - x_label.get_width()//2,
                                  self.height - self.margin//2))
 
         # Y-axis label (rotated text not directly supported in Pygame, so we'll position it)
-        y_label = self.label_font.render("Projected distance on DEC axis [km]", True, self.text_color)
+        y_label = self.label_font.render("Проекция расстояния по оси Склонения [км]", True, self.text_color)
 
         # Create a new surface to rotate the text
         y_label_rotated = pg.Surface((y_label.get_height(), y_label.get_width()), pg.SRCALPHA)
@@ -215,7 +215,7 @@ class PlotHandler:
         pg.draw.line(self.screen, (255, 0, 0), (int(nx), int(ny-7)), (int(nx), int(ny+7)), 1)
 
         # Label
-        text = self.small_font.render("Nucleus", True, (255, 0, 0))
+        text = self.small_font.render("Ядро кометы", True, (255, 0, 0))
         self.screen.blit(text, (int(nx) + 10, int(ny) - 10))
 
         return True
@@ -248,10 +248,10 @@ class PlotHandler:
         # Save the image
         try:
             pg.image.save(self.screen, output_file)
-            print(f"Saved particle plot to {output_file}")
+            print(f"График частиц сохранён: {output_file}")
             return True
         except Exception as e:
-            print(f"Error saving image: {e}")
+            print(f"Ошибка сохранения изображения: {e}")
             return False
 
     def add_particle(self, npar, mpar, color=None, size=1):
@@ -290,5 +290,4 @@ class PlotHandler:
             return True
 
         return False
-
 

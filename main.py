@@ -16,31 +16,34 @@ from utils.io_utils import reset_directory
 
 def parse_arguments():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description='COMTAILS Comet Dust Tail Simulation')
+    parser = argparse.ArgumentParser(description='COMTAILS: симулятор пылевого хвоста кометы')
 
     parser.add_argument('--input-dir', type=str, default='input',
-                        help='Directory containing input files')
+                        help='Каталог со входными файлами')
 
     parser.add_argument('--output-dir', type=str, default='output',
-                        help='Directory for output files')
+                        help='Каталог для выходных файлов')
 
     parser.add_argument('--config', type=str, default='TAIL_INPUTS.dat',
-                        help='Main configuration file name')
+                        help='Имя основного конфигурационного файла')
 
     parser.add_argument('--dust-profile', type=str, default='dmdt_vel_power_rmin_rmax.dat',
-                        help='Dust loss rate profile file name')
+                        help='Имя файла профиля пылепотерь')
+
+    parser.add_argument('--gui', action='store_true',
+                        help='Запустить простой графический интерфейс (GUI)')
 
     parser.add_argument('--validate', action='store_true',
-                        help='Validate results against expected values')
+                        help='Проверить результаты относительно эталонных значений')
 
     parser.add_argument('--expected-afrho', type=float, default=10.5,
-                        help='Expected Afrho value for validation')
+                        help='Эталонное значение Afrho для проверки')
 
     parser.add_argument('--expected-mag', type=float, default=8.07,
-                        help='Expected magnitude for validation')
+                        help='Эталонная звёздная величина для проверки')
 
     parser.add_argument('--tolerance', type=float, default=0.1,
-                        help='Validation tolerance (relative difference)')
+                        help='Допуск проверки (относительное отклонение)')
 
     return parser.parse_args()
 
@@ -49,6 +52,12 @@ def main():
     """Run the COMTAILS simulation."""
     # Parse command line arguments
     args = parse_arguments()
+
+    # Run GUI mode if requested
+    if args.gui:
+        from gui import run_gui
+        run_gui()
+        return
 
     # Check for required input files
     input_dir = args.input_dir
@@ -59,7 +68,7 @@ def main():
 
     for file in required_files:
         if not os.path.exists(file):
-            print(f"Error: Required input file '{file}' not found.")
+            print(f"Ошибка: обязательный входной файл '{file}' не найден.")
             sys.exit(1)
 
     # Print version information
@@ -82,7 +91,7 @@ def main():
         )
 
         if not validation_result:
-            print("Validation failed!")
+            print("Проверка не пройдена!")
             sys.exit(1)
 
     # Print version information again

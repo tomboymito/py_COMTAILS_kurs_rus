@@ -342,10 +342,6 @@ class SimulationController:
                       f"звёздная величина={mag} (ожидалось {expected_mag})")
                 return False
             else:
-                print(f"Проверка пройдена: Afrho={afrho}, звёздная величина={mag}")
-                      f"Mag={mag} (ожидалось {expected_mag})")
-                return False
-            else:
                 print(f"Проверка пройдена: Afrho={afrho}, Mag={mag}")
                 return True
         except Exception as e:

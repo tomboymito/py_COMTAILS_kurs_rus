@@ -69,21 +69,21 @@ class StarField:
         }
 
         # Debug: Print the request parameters
-        print(f"Query coordinates: RA={ra_str}, DEC={sign}{de_str}")
-        print(f"Magnitude limit: {self.config.maglim}")
+        print(f"Координаты запроса: ПВ={ra_str}, Склонение={sign}{de_str}")
+        print(f"Предельная звёздная величина: {self.config.maglim}")
 
         # Download data
         try:
-            print("Downloading star field coordinate/mag table...")
+            print("Загрузка таблицы координат и звёздных величин поля...")
             response = requests.get(base_url, params=params)
 
             if response.status_code != 200:
-                print(f"Error downloading star data: HTTP {response.status_code}")
+                print(f"Ошибка загрузки данных звёздного поля: HTTP {response.status_code}")
                 return False
 
             # Check for server error in response
             if 'stat="ERROR"' in response.text:
-                print(f"Server returned an error in response")
+                print("Сервер вернул сообщение об ошибке")
                 print(response.text[:500])  # Print first part of response for debugging
                 return False
 
@@ -92,24 +92,24 @@ class StarField:
             with open(star_data_file, 'w') as f:
                 f.write(response.text)
 
-            print(f"Star data saved to {star_data_file}")
+            print(f"Данные звёздного поля сохранены в {star_data_file}")
 
             # Check if the file contains actual data
             with open(star_data_file, 'r') as f:
                 content = f.read()
                 if '|' not in content:
-                    print("Warning: Downloaded file does not contain expected column separator '|'")
-                    print("First 100 characters of response:")
+                    print("Предупреждение: в загруженном файле не найден ожидаемый разделитель '|'")
+                    print("Первые 100 символов ответа:")
                     print(content[:100])
                 else:
                     # Count data lines (very rough estimate)
                     data_lines = sum(1 for line in content.splitlines() if '|' in line)
-                    print(f"Downloaded approximately {data_lines} data lines")
+                    print(f"Загружено примерно {data_lines} строк данных")
 
             return True
 
         except Exception as e:
-            print(f"Error in download_star_field: {e}")
+            print(f"Ошибка в download_star_field: {e}")
             return False
 
     def process_star_field(self, apply_filtering=False):
@@ -131,7 +131,7 @@ class StarField:
         try:
             # Open output file
             with open(output_file, 'w') as star_file:
-                print(f"Processing star data from {star_data_file}")
+                print(f"Обработка данных звёздного поля из {star_data_file}")
 
                 # Read the entire file to analyze structure
                 with open(star_data_file, 'r') as f:
@@ -237,11 +237,11 @@ class StarField:
                         # Just skip problematic lines silently
                         continue
 
-                print(f"Processed {processed_count} stars, {self.star_count} added within magnitude limit {self.config.maglim}")
+                print(f"Обработано {processed_count} звёзд, добавлено {self.star_count} в пределах лимита {self.config.maglim}")
                 return self.star_count
 
         except Exception as e:
-            print(f"Error processing star field: {e}")
+            print(f"Ошибка обработки звёздного поля: {e}")
             return 0
 
     def get_flux_array(self):

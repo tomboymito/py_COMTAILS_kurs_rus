@@ -49,6 +49,12 @@ python main.py --input-dir input --output-dir output --config TAIL_INPUTS.dat --
 python main.py --gui
 ```
 
+GUI + автоматический запуск расчёта сразу после открытия окна:
+
+```bash
+python main.py --gui --gui-autorun
+```
+
 В GUI доступны:
 
 - **Журнал вычислений** (пошаговый лог расчёта);

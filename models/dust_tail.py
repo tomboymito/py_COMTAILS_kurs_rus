@@ -144,14 +144,14 @@ class DustTail:
                             nshadow += 1
 
                     if nshadow == config.nevent:
-                        print(f"The entire prescribed area is in darkness at: "
-                              f"{time - config.per_jd:10.3f} days to perihelion")
+                        print(f"Вся заданная активная область в тени при "
+                              f"{time - config.per_jd:10.3f} суток до перигелия")
                         dmdt = FLOAT_TYPE(0.0)
                         xmass = FLOAT_TYPE(0.0)
                         skip_particles = True
                     else:
                         red_factor = FLOAT_TYPE(1.0 - float(nshadow) / float(config.nevent))
-                        print(f"  Applying red_factor={red_factor:.4f} to dust production")
+                        print(f"  Применяется коэффициент ослабления red_factor={red_factor:.4f} к пылепроизводительности")
                         dmdt *= red_factor
                         xmass *= red_factor
 
@@ -347,7 +347,7 @@ class DustTail:
             tuple: (dmdtl, power, vfac, radmin, radmax)
         """
         if xdtime < config.dtime[0] or xdtime > config.dtime[config.ninputs - 1]:
-            print(f"Time to perihelion={xdtime} is out of bounds, using nearest value")
+            print(f"Время до перигелия={xdtime} вне диапазона таблицы, используется ближайшее значение")
             if xdtime < config.dtime[0]:
                 return (FLOAT_TYPE(config.dmdtlog[0]),
                         FLOAT_TYPE(config.powera[0]),
@@ -585,14 +585,14 @@ def dust_tail_worker(itime_start, itime_end, comet, config):
                     nshadow += 1
 
             if nshadow == config.nevent:
-                print(f"The entire prescribed area is in darkness at: "
-                      f"{time - config.per_jd:10.3f} days to perihelion")
+                print(f"Вся заданная активная область в тени при "
+                      f"{time - config.per_jd:10.3f} суток до перигелия")
                 dmdt = FLOAT_TYPE(0.0)
                 xmass = FLOAT_TYPE(0.0)
                 skip_particles = True
             else:
                 red_factor = FLOAT_TYPE(1.0 - float(nshadow) / float(config.nevent))
-                print(f"  Applying red_factor={red_factor:.4f} to dust production")
+                print(f"  Применяется коэффициент ослабления red_factor={red_factor:.4f} к пылепроизводительности")
                 dmdt *= red_factor
                 xmass *= red_factor
 

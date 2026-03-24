@@ -147,13 +147,13 @@ class HorizonsClient:
             response = requests.post(self.base_url, data=params)
 
             if response.status_code != 200:
-                print(f"Error getting data from JPL: {response.status_code}")
+                print(f"Ошибка запроса к JPL: HTTP {response.status_code}")
                 return ""
 
             return response.text
 
         except Exception as e:
-            print(f"Error in JPL request: {e}")
+            print(f"Ошибка при запросе к JPL: {e}")
             return ""
 
     def _parse_earth_position(self, response):
@@ -195,16 +195,16 @@ class HorizonsClient:
                             earth_position['y'] = FLOAT_TYPE(float(y_part))
                             earth_position['z'] = FLOAT_TYPE(float(z_part))
 
-                            print(f"Earth position found: {earth_position}")
+                            print(f"Найдены координаты Земли: {earth_position}")
                             earth_position_found = True
                             break
                         except (ValueError, IndexError) as e:
-                            print(f"Failed to parse Earth position: {e}")
+                            print(f"Не удалось разобрать координаты Земли: {e}")
                             continue
                 break
 
         if not earth_position_found:
-            print("WARNING: Could not find valid Earth position in JPL response")
+            print("ПРЕДУПРЕЖДЕНИЕ: в ответе JPL не найдены корректные координаты Земли")
 
         return earth_position
 
@@ -295,7 +295,7 @@ class HorizonsClient:
                         comet_data['plang'] = FLOAT_TYPE(float(parts[6]))
                         comet_data['phas_ang'] = FLOAT_TYPE(float(parts[7]))
                 except Exception as e:
-                    print(f"Failed to parse astrometric data: {e}")
+                    print(f"Не удалось разобрать астрометрические данные: {e}")
                     # Default values are already set
 
                 break

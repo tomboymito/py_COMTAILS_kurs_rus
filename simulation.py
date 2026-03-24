@@ -1,9 +1,7 @@
-"""
-Main simulation controller for COMTAILS.
+"""Главный контроллер моделирования COMTAILS.
 
-This module provides the core simulation controller that orchestrates the
-comet dust tail simulation. It improves upon the original COMTAILS.for Fortran 77 code
-by Fernando Moreno IAA-CSIC by implementing a cleaner object-oriented design.
+Модуль оркестрирует полный цикл расчёта пылевого хвоста кометы:
+от чтения входных данных до записи научных выходных файлов.
 """
 import os
 import time
@@ -21,15 +19,10 @@ from constants import FLOAT_TYPE
 
 
 class SimulationController:
-    """
-    Main controller for the COMTAILS simulation.
-
-    This class coordinates the entire simulation pipeline from reading inputs to
-    producing the final outputs.
-    """
+    """Главный контроллер конвейера моделирования COMTAILS."""
 
     def __init__(self):
-        """Initialize the simulation controller."""
+        """Инициализировать контроллер моделирования."""
         self.config = None
         self.comet = None
         self.dust_tail = None
@@ -258,6 +251,14 @@ class SimulationController:
             self.plot_handler.close()
             print("График частиц успешно сформирован")
 
+        # Резервное превью: dust_particles.png -> tail_preview.ppm -> tail_preview.png
+        final_image = "output/dust_particles.png"
+        if not os.path.exists(final_image):
+            ppm_preview = save_flux_ppm(self.config.flux, "output/tail_preview.ppm")
+            print(f"Сформировано резервное превью: {ppm_preview}")
+            png_preview = save_flux_png(self.config.flux, "output/tail_preview.png")
+            if png_preview:
+                print(f"Сформировано резервное превью: {png_preview}")
         # Fallback preview: dust_particles.png -> tail_preview.ppm -> tail_preview.png
         final_image = "output/dust_particles.png"
         if not os.path.exists(final_image):
@@ -338,6 +339,10 @@ class SimulationController:
 
             if afrho_diff > tolerance or mag_diff > tolerance:
                 print(f"Проверка не пройдена: Afrho={afrho} (ожидалось {expected_afrho}), "
+                      f"звёздная величина={mag} (ожидалось {expected_mag})")
+                return False
+            else:
+                print(f"Проверка пройдена: Afrho={afrho}, звёздная величина={mag}")
                       f"Mag={mag} (ожидалось {expected_mag})")
                 return False
             else:

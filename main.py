@@ -1,9 +1,7 @@
-"""
-Main entry point for COMTAILS simulation.
+"""Точка входа в COMTAILS.
 
-This module provides the entry point for running the comet dust tail simulation.
-It uses the refactored object-oriented design to improve upon the original
-COMTAILS.for Fortran 77 code by Fernando Moreno IAA-CSIC.
+Модуль запускает моделирование пылевого хвоста кометы
+в консольном режиме или в графическом интерфейсе.
 """
 import os
 import sys
@@ -15,6 +13,7 @@ from utils.io_utils import reset_directory
 
 
 def parse_arguments():
+    """Разобрать аргументы командной строки."""
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='COMTAILS: симулятор пылевого хвоста кометы')
 
@@ -32,6 +31,8 @@ def parse_arguments():
 
     parser.add_argument('--gui', action='store_true',
                         help='Запустить простой графический интерфейс (GUI)')
+    parser.add_argument('--gui-autorun', action='store_true',
+                        help='В режиме GUI сразу запустить расчёт после открытия окна')
 
     parser.add_argument('--validate', action='store_true',
                         help='Проверить результаты относительно эталонных значений')
@@ -49,13 +50,20 @@ def parse_arguments():
 
 
 def main():
-    """Run the COMTAILS simulation."""
+    """Запустить моделирование COMTAILS."""
     # Parse command line arguments
     args = parse_arguments()
 
     # Run GUI mode if requested
     if args.gui:
         from gui import run_gui
+        run_gui(
+            input_dir=args.input_dir,
+            output_dir=args.output_dir,
+            config_file=args.config,
+            dust_profile=args.dust_profile,
+            auto_run=args.gui_autorun
+        )
         run_gui()
         return
 
